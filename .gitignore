@@ -2,3 +2,4 @@ node_modules/
 capturing/
 captured/
 .idea/*
+config.yml
