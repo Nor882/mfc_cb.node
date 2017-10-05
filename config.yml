@@ -1,5 +1,5 @@
-captureDirectory: 'N:\Chaturbate\capturing'
-completeDirectory: 'N:\Chaturbate\captured'
+captureDirectory: 'capturing'
+completeDirectory: 'captured'
 modelSubdir: true
 modelScanInterval: 100
 autoConvertType: mp4
