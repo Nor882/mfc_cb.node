@@ -267,7 +267,6 @@ function postProcess(site, filename, model) {
     if (!config.keepTsFile) {
       fs.unlinkSync(config.captureDirectory + '/' + filename + '.ts');
     }
-    CB.updateWindowModelCapCount();
     semaphore--; // release semaphore only when ffmpeg process has ended
   });
 
@@ -312,7 +311,6 @@ function startCapture(site, spawnArgs, filename, model) {
       notifier.notify({ title: 'mfc_cb.node', message: model.nm + ' recording started', contentImage: './mfc.png', icon: './cb.ico' });
     }
     site.addModelToCapList(model, filename, captureProcess);
-    CB.updateWindowModelCapCount();
   }
 }
 
