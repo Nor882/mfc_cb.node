@@ -1,0 +1,14 @@
+{
+    "curly"      : true,
+    "forin"      : true,
+    "freeze"     : true,
+    "immed"      : true,
+    "latedef"    : true,
+    "loopfunc"   : true,
+    "quotmark"   : true,
+    "unused"     : true,
+    "undef"      : true,
+
+    "node"       : true,
+    "esversion"  : 6
+}
