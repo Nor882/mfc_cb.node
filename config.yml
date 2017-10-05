@@ -1,5 +1,5 @@
-captureDirectory: 'capturing'
-completeDirectory: 'captured'
+captureDirectory: capturing
+completeDirectory: captured
 modelSubdir: true
 modelScanInterval: 100
 autoConvertType: mp4
