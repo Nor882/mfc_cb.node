@@ -1,20 +1,20 @@
 'use strict';
 
-var Promise = require('bluebird');
-var colors  = require('colors/safe');
-var mfc     = require('MFCAuto');
-var common  = require('./common');
+let Promise = require('bluebird');
+let colors  = require('colors/safe');
+let mfc     = require('MFCAuto');
+let common  = require('./common');
 
-var mfcGuest;
-var me; // backpointer for common print methods
+let mfcGuest;
+let me; // backpointer for common print methods
 
-var modelsToCap = [];
-var modelState = new Map();
-var currentlyCapping = new Map();
+let modelsToCap = [];
+let modelState = new Map();
+let currentlyCapping = new Map();
 
 function haltCapture(model) {
   if (currentlyCapping.has(model.uid)) {
-    var capInfo = currentlyCapping.get(model.uid);
+    let capInfo = currentlyCapping.get(model.uid);
     capInfo.captureProcess.kill('SIGINT');
   }
 }
@@ -68,8 +68,8 @@ module.exports = {
       return mfcGuest.queryUser(uid);
     }).then(function(model) {
       if (model !== undefined) {
-        var isBroadcasting = 0;
-        var msg = colors.model(model.nm);
+        let isBroadcasting = 0;
+        let msg = colors.model(model.nm);
         if (model.vs === mfc.STATE.FreeChat) {
           msg = msg + ' is in public chat!';
           modelsToCap.push(model);
@@ -143,8 +143,8 @@ module.exports = {
     }
 
     return Promise.try(function() {
-      var filename = common.getFileName(me, model.nm);
-      var spawnArgs = common.getCaptureArguments('http://video' + (model.u.camserv - 500) + '.myfreecams.com:1935/NxServer/ngrp:mfc_' + (100000000 + model.uid) + '.f4v_mobile/playlist.m3u8', filename);
+      let filename = common.getFileName(me, model.nm);
+      let spawnArgs = common.getCaptureArguments('http://video' + (model.u.camserv - 500) + '.myfreecams.com:1935/NxServer/ngrp:mfc_' + (100000000 + model.uid) + '.f4v_mobile/playlist.m3u8', filename);
 
       return {spawnArgs: spawnArgs, filename: filename, model: model};
     })

@@ -18,6 +18,8 @@ includeSiteInFile: false
 includeSiteInDir: false
 enableMFC: false
 enableCB: true
+recordCount: true
+useGUI: true
 mfcmodels: null
 cbmodels:
   - test
