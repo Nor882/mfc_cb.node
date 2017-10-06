@@ -2,26 +2,26 @@
 require('events').EventEmitter.prototype._maxListeners = 100;
 
 // Load 3rd Party Libraries
-var Promise      = require('bluebird');
-var fs           = require('fs');
-var mv           = require('mv');
-var yaml         = require('js-yaml');
-var mkdirp       = require('mkdirp');
-var colors       = require('colors/safe');
-var _            = require('underscore');
-var childProcess = require('child_process');
-var path         = require('path');
-var notifier     = require('node-notifier');
+let Promise      = require('bluebird');
+let fs           = require('fs');
+let mv           = require('mv');
+let yaml         = require('js-yaml');
+let mkdirp       = require('mkdirp');
+let colors       = require('colors/safe');
+let _            = require('underscore');
+let childProcess = require('child_process');
+let path         = require('path');
+let notifier     = require('node-notifier');
 
 // Load local libraries
-var common       = require('./common');
-var MFC          = require('./mfc');
-var CB           = require('./cb');
+let common       = require('./common');
+let MFC          = require('./mfc');
+let CB           = require('./cb');
 
-var SITES        = [MFC, CB];
-var semaphore    = 0; // Counting semaphore
-var tryingToExit = 0;
-var config       = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'));
+let SITES        = [MFC, CB];
+let semaphore    = 0; // Counting semaphore
+let tryingToExit = 0;
+let config       = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'));
 
 config.captureDirectory  = path.resolve(config.captureDirectory);
 config.completeDirectory = path.resolve(config.completeDirectory);
@@ -37,13 +37,13 @@ function sleep(time) {
 
 // Processes updates.yml and adds or removes models from config.yml
 function processUpdates(site) {
-  var stats = fs.statSync('updates.yml');
+  let stats = fs.statSync('updates.yml');
 
-  var includeModels = [];
-  var excludeModels = [];
+  let includeModels = [];
+  let excludeModels = [];
 
   if (stats.isFile()) {
-    var updates = yaml.safeLoad(fs.readFileSync('updates.yml', 'utf8'));
+    let updates = yaml.safeLoad(fs.readFileSync('updates.yml', 'utf8'));
 
     switch (site) {
       case MFC:
@@ -93,7 +93,7 @@ function processUpdates(site) {
 }
 
 function addModel(site, model) {
-  var index;
+  let index;
 
   switch (site) {
     case MFC: index = config.mfcmodels.indexOf(model.uid); break;
@@ -117,15 +117,13 @@ function addModel(site, model) {
 }
 
 function addModels(site, bundle) {
-  var i;
-
   switch (site) {
     case MFC:
       // Fetch the UID of new models to add to capture list.
       // The model does not have to be online for this.
-      var queries = [];
-      for (i = 0; i < bundle.includeModels.length; i++) {
-        var query = MFC.queryUser(bundle.includeModels[i]).then((model) => {
+      let queries = [];
+      for (let i = 0; i < bundle.includeModels.length; i++) {
+        let query = MFC.queryUser(bundle.includeModels[i]).then((model) => {
           if (typeof model !== 'undefined') {
             bundle.dirty |= addModel(site, model);
           }
@@ -138,12 +136,11 @@ function addModels(site, bundle) {
       });
 
     case CB:
-      for (i = 0; i < bundle.includeModels.length; i++) {
+      for (let i = 0; i < bundle.includeModels.length; i++) {
         bundle.dirty |= addModel(site, {nm: bundle.includeModels[i], uid: bundle.includeModels[i]});
       }
       return bundle;
   }
-  return;
 }
 
 function removeModel(site, model) {
@@ -160,14 +157,13 @@ function removeModel(site, model) {
 }
 
 function removeModels(site, bundle) {
-  var i;
   switch (site) {
     case MFC:
       // Fetch the UID of current models to be excluded from capture list.
       // The model does not have to be online for this.
-      var queries = [];
-      for (i = 0; i < bundle.excludeModels.length; i++) {
-        var query = MFC.queryUser(bundle.excludeModels[i]).then((model) => {
+      let queries = [];
+      for (let i = 0; i < bundle.excludeModels.length; i++) {
+        let query = MFC.queryUser(bundle.excludeModels[i]).then((model) => {
           if (typeof model !== 'undefined') {
             bundle.dirty |= removeModel(site, model);
           }
@@ -180,16 +176,15 @@ function removeModels(site, bundle) {
       });
 
     case CB:
-      for (i = 0; i < bundle.excludeModels.length; i++) {
-        var nm = bundle.excludeModels[i];
-        var index = config.cbmodels.indexOf(nm);
+      for (let i = 0; i < bundle.excludeModels.length; i++) {
+        let nm = bundle.excludeModels[i];
+        let index = config.cbmodels.indexOf(nm);
         if (index !== -1) {
           bundle.dirty |= removeModel(site, {nm: nm, uid: nm});
         }
       }
       return bundle.dirty;
   }
-  return;
 }
 
 function writeConfig(site, dirty) {
@@ -200,10 +195,10 @@ function writeConfig(site, dirty) {
 }
 
 function postProcess(site, filename, model) {
-  var modelDir = config.completeDirectory;
+  let modelDir = config.completeDirectory;
 
   if (config.modelSubdir) {
-    var siteStr = '';
+    let siteStr = '';
     if (config.includeSiteInDir) {
       // If a model has the same name on both mfc and cb, but with different
       // case, and if the user is running node using bash for windows, weird
@@ -228,8 +223,8 @@ function postProcess(site, filename, model) {
     return;
   }
 
-  var mySpawnArguments;
-  if (config.autoConvertType == 'mp4') {
+  let mySpawnArguments;
+  if (config.autoConvertType === 'mp4') {
     mySpawnArguments = [
       '-hide_banner',
       '-v',
@@ -243,7 +238,7 @@ function postProcess(site, filename, model) {
       '-copyts',
       modelDir + '/' + filename + '.' + config.autoConvertType
     ];
-  } else if (config.autoConvertType == 'mkv') {
+  } else if (config.autoConvertType === 'mkv') {
     mySpawnArguments = [
       '-hide_banner',
       '-v',
@@ -261,13 +256,14 @@ function postProcess(site, filename, model) {
 
   common.msg(site, colors.model(model.nm) + ' converting to ' + filename + '.' + config.autoConvertType);
 
-  var myCompleteProcess = childProcess.spawn('ffmpeg', mySpawnArguments);
+  let myCompleteProcess = childProcess.spawn('ffmpeg', mySpawnArguments);
 
   myCompleteProcess.on('close', function() {
     if (!config.keepTsFile) {
       fs.unlinkSync(config.captureDirectory + '/' + filename + '.ts');
     }
     CB.updateWindowModelCapCount();
+    common.msg(site, 'Done converting ' + model.nm + '.');
     semaphore--; // release semaphore only when ffmpeg process has ended
   });
 
@@ -278,7 +274,7 @@ function postProcess(site, filename, model) {
 
 function startCapture(site, spawnArgs, filename, model) {
 
-  var captureProcess = childProcess.spawn('ffmpeg', spawnArgs);
+  let captureProcess = childProcess.spawn('ffmpeg', spawnArgs);
 
   captureProcess.on('close', function() {
     if (tryingToExit) {
@@ -292,7 +288,7 @@ function startCapture(site, spawnArgs, filename, model) {
         notifier.notify({ title: 'mfc_cb.node', message: model.nm + ' recording stopped'});
       }
       if (err) {
-        if (err.code == 'ENOENT') {
+        if (err.code === 'ENOENT') {
           common.errMsg(site, colors.model(model.nm) + ', ' + filename + '.ts not found in capturing directory, cannot convert to ' + config.autoConvertType);
         } else {
           common.errMsg(site, colors.model(model.nm) + ': ' + err.toString());
@@ -347,23 +343,19 @@ function mainSiteLoop(site) {
   })
   .then(function(modelsToCap) {
     if (modelsToCap !== null) {
-      if (modelsToCap.length > 0) {
-        common.dbgMsg(site, modelsToCap.length + ' model(s) to capture');
-        var caps = [];
-        for (var i = 0; i < modelsToCap.length; i++) {
-          var cap = site.setupCapture(modelsToCap[i], tryingToExit).then(function(bundle) {
-            if (bundle.spawnArgs !== '') {
-              startCapture(site, bundle.spawnArgs, bundle.filename, bundle.model);
+        if (modelsToCap.length > 0) {
+            common.dbgMsg(site, modelsToCap.length + ' model(s) to capture');
+            let caps = [];
+            for (let i = 0; i < modelsToCap.length; i++) {
+                let cap = site.setupCapture(modelsToCap[i], tryingToExit).then(function (bundle) {
+                    if (bundle.spawnArgs !== '') {
+                        startCapture(site, bundle.spawnArgs, bundle.filename, bundle.model);
+                    }
+                });
+                caps.push(cap);
             }
-          });
-          caps.push(cap);
+            return Promise.all(caps);
         }
-        return Promise.all(caps);
-      } else {
-        return;
-      }
-    } else {
-      return;
     }
   })
   .catch(function(err) {
@@ -393,8 +385,8 @@ function tryExit() {
   // SIGINT will get passed to any running ffmpeg captures.
   // Must delay exiting until the capture and postProcess
   // for all models have finished.  Keep checking every 1s
-  var capsInProgress = 0;
-  for (var i = 0; i < SITES.length; i++) {
+  let capsInProgress = 0;
+  for (let i = 0; i < SITES.length; i++) {
     capsInProgress += SITES[i].getNumCapsInProgress();
   }
   if (semaphore === 0 && capsInProgress === 0) {
@@ -413,8 +405,8 @@ process.on('SIGINT', function() {
   // Prevent bad things from happening if user holds down ctrl+c
   if (!tryingToExit) {
     tryingToExit = 1;
-    var capsInProgress = 0;
-    for (var i = 0; i < SITES.length; i++) {
+    let capsInProgress = 0;
+    for (let i = 0; i < SITES.length; i++) {
       capsInProgress += SITES[i].getNumCapsInProgress();
     }
     if (semaphore > 0 || capsInProgress > 0) {

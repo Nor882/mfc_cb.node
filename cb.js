@@ -1,24 +1,24 @@
 'use strict';
 
-var Promise = require('bluebird');
-var colors  = require('colors/safe');
-var bhttp   = require('bhttp');
-var cheerio = require('cheerio');
-var common  = require('./common');
+let Promise = require('bluebird');
+let colors  = require('colors/safe');
+let bhttp   = require('bhttp');
+let cheerio = require('cheerio');
+let common  = require('./common');
 
-var session = bhttp.session();
-var me; // backpointer for common printing methods
+let session = bhttp.session();
+let me; // backpointer for common printing methods
 
-var modelsToCap = [];
-var onlineModels = new Map();
-var modelState = new Map();
-var currentlyCapping = new Map();
+let modelsToCap = [];
+let onlineModels = new Map();
+let modelState = new Map();
+let currentlyCapping = new Map();
 
 function findOnlineModels() {
   return Promise.try(function() {
     return bhttp.get('http://chaturbate.com/affiliates/api/onlinerooms/?wm=mnzQo&format=json&gender=f');
   }).then(function(response) {
-    for (var i = 0; i < response.body.length; i++) {
+    for (let i = 0; i < response.body.length; i++) {
       onlineModels.set(response.body[i].username, response.body[i].current_show);
     }
   })
@@ -31,15 +31,15 @@ function getStream(nm) {
   return Promise.try(function() {
     return session.get('https://chaturbate.com/' + nm + '/');
   }).then(function (response) {
-    var url = '';
-    var page = cheerio.load(response.body);
+    let url = '';
+    let page = cheerio.load(response.body);
 
-    var scripts = page('script')
+    let scripts = page('script')
     .map(function(){
       return page(this).text();
     }).get().join('');
 
-    var streamData = scripts.match(/(https\:\/\/\w+\.stream\.highwebmedia\.com\/live-edge\/[\w\-]+\/playlist\.m3u8)/i);
+    let streamData = scripts.match(/(https\:\/\/\w+\.stream\.highwebmedia\.com\/live-edge\/[\w\-]+\/playlist\.m3u8)/i);
 
     if (streamData !== null) {
       url = streamData[1];
@@ -68,7 +68,7 @@ function getStream(nm) {
 
 function haltCapture(nm) {
   if (currentlyCapping.has(nm)) {
-    var capInfo = currentlyCapping.get(nm);
+    let capInfo = currentlyCapping.get(nm);
     capInfo.captureProcess.kill('SIGINT');
   }
 }
@@ -85,10 +85,10 @@ module.exports = {
 
   checkModelState: function(nm) {
     return Promise.try(function() {
-      var msg = colors.model(nm);
-      var isBroadcasting = 0;
+      let msg = colors.model(nm);
+      let isBroadcasting = 0;
       if (onlineModels.has(nm)) {
-        var currState = onlineModels.get(nm);
+        let currState = onlineModels.get(nm);
         if (currState === 'public') {
           msg = msg + ' is in public chat!';
           modelsToCap.push({uid: nm, nm: nm});
@@ -169,8 +169,8 @@ module.exports = {
     return Promise.try(function() {
       return getStream(model.nm);
     }).then(function (url) {
-      var filename = common.getFileName(me, model.nm);
-      var spawnArgs = common.getCaptureArguments(url, filename);
+      let filename = common.getFileName(me, model.nm);
+      let spawnArgs = common.getCaptureArguments(url, filename);
 
       if (url === '') {
         return {spawnArgs: '', filename: filename, model: model};

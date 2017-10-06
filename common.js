@@ -1,20 +1,20 @@
 'use strict';
 
-var fs     = require('fs');
-var yaml   = require('js-yaml');
-var moment = require('moment');
-var colors = require('colors/safe');
+let fs     = require('fs');
+let yaml   = require('js-yaml');
+let moment = require('moment');
+let colors = require('colors/safe');
 
-var config = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'));
-var MFC;
-var CB;
+let config = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'));
+let MFC;
+let CB;
 
 function getDateTime() {
   return moment().format(config.dateFormat);
 }
 
 function getSiteName(site) {
-  var name;
+  let name;
   switch (site) {
     case MFC: name = 'MFC'; break;
     case CB:  name = 'CB '; break;
@@ -64,7 +64,7 @@ module.exports = {
   },
 
   getFileName: function(site, nm) {
-    var filename;
+    let filename;
     if (config.includeSiteInFile) {
       filename = nm + '_' + getSiteName(site).trim().toLowerCase() + '_' + getDateTime();
     } else {
@@ -75,8 +75,8 @@ module.exports = {
 
   checkFileSize: function(site, captureDirectory, maxByteSize, currentlyCapping) {
     if (maxByteSize > 0) {
-      for (var capInfo of currentlyCapping.values()) {
-        var stat = fs.statSync(captureDirectory + '/' + capInfo.filename + '.ts');
+      for (let capInfo of currentlyCapping.values()) {
+        let stat = fs.statSync(captureDirectory + '/' + capInfo.filename + '.ts');
         dbgMsg(site, colors.model(capInfo.nm) + ' file size (' + capInfo.filename + '.ts), size=' + stat.size + ', maxByteSize=' + maxByteSize);
         if (stat.size >= maxByteSize) {
           msg(site, colors.model(capInfo.nm) + ' recording has exceeded file size limit (size=' + stat.size + ' > maxByteSize=' + maxByteSize + ')');
@@ -102,23 +102,22 @@ module.exports = {
   },
 
   getCaptureArguments: function(url, filename) {
-    var spawnArgs = [
-      '-hide_banner',
-      '-v',
-      'fatal',
-      '-i',
-      url,
-      '-c',
-      'copy',
-     '-vsync',
-      '2',
-      '-r',
-      '60',
-      '-b:v',
-      '500k',
-      config.captureDirectory + '/' + filename + '.ts'
+      return [
+        '-hide_banner',
+        '-v',
+        'fatal',
+        '-i',
+        url,
+        '-c',
+        'copy',
+        '-vsync',
+        '2',
+        '-r',
+        '60',
+        '-b:v',
+        '500k',
+        config.captureDirectory + '/' + filename + '.ts'
     ];
-    return spawnArgs;
   },
 
   msg: function(site, themsg) {
